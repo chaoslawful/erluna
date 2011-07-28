@@ -3,7 +3,7 @@ all: build
 build:
 	@./rebar compile
 
-ct:
+ct: build
 	@./rebar ct
 
 clean:

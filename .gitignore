@@ -1,4 +1,7 @@
 logs
 *.beam
 erl_crash.dump
+*.app
+*.so
+*.o
 

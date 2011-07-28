@@ -45,6 +45,7 @@
 -include("erluna.hrl").
 
 start() ->
+  application:start(erluna),
   case erl_ddll:load_driver(driver_dir(), ?DRIVER_NAME) of
     ok                      -> open();
     {error, already_loaded} -> open();
@@ -52,17 +53,17 @@ start() ->
   end.
 
 driver_dir() ->
-  Path = lists:map(
-    fun (Path) -> filename:join([Path, "..", "priv", "lib"]) end,
-    code:get_path()
-  ),
-  case file:path_open(Path, ?DRIVER_NAME ++ ".so", [read]) of
-    {ok, IoDevice, FullName} ->
-      file:close(IoDevice),
-      filename:dirname(FullName);
-    _Other ->
-      "./"
-  end.
+    Path = lists:map(
+        fun (Path) -> filename:join([Path, "..", "priv", "lib"]) end,
+        code:get_path()
+    ),
+    case file:path_open(Path, ?DRIVER_NAME ++ ".so", [read]) of
+        {ok, IoDevice, FullName} ->
+            file:close(IoDevice),
+            filename:dirname(FullName);
+        _Other ->
+            "./"
+    end.
 
 open() ->
   {ok, #erluna{port = open_port({spawn, ?DRIVER_NAME}, [])}}.
@@ -126,4 +127,6 @@ async_set(Name, Value, Lua) ->
     Lua#erluna.port,
     term_to_binary({?COMMAND_SET, Name, Value})
   ).
+
+% vi:ts=4 sw=4 et fdm=marker
 

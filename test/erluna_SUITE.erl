@@ -22,7 +22,7 @@
 -include("ct.hrl").
 -include("erluna_test.hrl").
 
-all() -> [test_set, test_eval, test_apply].
+all() -> [test_set, test_eval, test_apply, test_eval_file].
 
 test_set() -> [].
 test_set(_Conf) ->
@@ -90,3 +90,10 @@ test_apply(_Conf) ->
   ?assertMatch(Lua:stop(), ok, stop),
   ok.
 
+test_eval_file() -> [].
+test_eval_file(Conf) ->
+	{ok, Lua} = erluna:start(),
+	File = ?config(data_dir, Conf) ++ "/test.lua",
+	?assertMatch(Lua:eval_file(File), ok, eval_test_lua),
+	?assertMatch(Lua:stop(), ok, stop),
+	ok.
