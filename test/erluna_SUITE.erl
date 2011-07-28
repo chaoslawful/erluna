@@ -19,7 +19,7 @@
 -module(erluna_SUITE).
 -compile(export_all).
 
--include("ct.hrl").
+-include_lib("common_test/include/ct.hrl").
 -include("erluna_test.hrl").
 
 all() -> [test_set, test_eval, test_apply, test_eval_file].
