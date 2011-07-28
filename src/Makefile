@@ -19,7 +19,7 @@ HEADERS = $(wildcard $(INCLUDE)/include/*.hrl)
 OBJECTS = $(SOURCES:%.erl=$(EBIN)/%.$(EMULATOR))
 
 COMPILE_FLAGS += \
-	+warn_unused_vars +nowarn_shadow_vars +warn_unused_import +debug_info
+	+warn_unused_vars +warn_shadow_vars +warn_unused_import +debug_info
 
 $(EBIN)/%.$(EMULATOR): %.erl
 	erlc -pa $(EBIN) -W $(COMPILE_FLAGS) -I$(INCLUDE) -o$(EBIN) $<
