@@ -23,6 +23,12 @@ LIBS     += -L$(EI_ROOT)/lib -lei -lerl_interface
 
 OPTIONS = -fpic -O2
 
+ifeq ($(shell uname), Linux)
+	CFLAGS += -Wall -Wextra -g3 -O2 -fpic
+	LIBS += -lm -ldl
+	OPTIONS = -shared
+endif
+
 ifeq ($(shell uname), Darwin)
   OPTIONS   += -fno-common -bundle -undefined suppress -flat_namespace
   USR_LOCAL = /opt/local

@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <string.h> # memcpy
+#include <string.h>	/* memcpy */
 
 #include "ei.h"
 #include "erl_driver.h"
@@ -22,22 +22,32 @@ static void output(ErlDrvData handle, char *buf, int len);
 static void ready_async(ErlDrvData handle, ErlDrvThreadData async_handle);
 
 static ErlDrvEntry erluna_driver_entry = {
-    NULL,
-    start,       /* open_port/2 */
-    stop,        /* port_close/1 */
-    output,      /* port_command/2 */
-    NULL,
-    NULL,
-    "erluna_drv",
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    ready_async, /* driver_async via C */
+    NULL,           /* init */
+    start,          /* start */
+    stop,           /* stop */
+    output,         /* output */
+    NULL,           /* ready_input */
+    NULL,           /* ready_output */
+    "erluna_drv",   /* driver_name */
+    NULL,           /* finish */
+    NULL,           /* reserved */
+    NULL,           /* control */
+    NULL,           /* timeout */
+    NULL,           /* outputv */
+    ready_async,    /* ready_async */
+    NULL,           /* flush */
+    NULL,           /* call */
+    NULL            /* event */
+#ifdef ERL_DRV_EXTENDED_MARKER
+    ,
+    ERL_DRV_EXTENDED_MARKER,
+    ERL_DRV_EXTENDED_MAJOR_VERSION,
+    ERL_DRV_EXTENDED_MINOR_VERSION,
+    0,
     NULL,
     NULL,
     NULL
+#endif
 };
 
 DRIVER_INIT(erluna_driver)
@@ -50,6 +60,7 @@ static ErlDrvData start(ErlDrvPort port, char *command)
 { 
     lua_State *L = luaL_newstate();
     luaL_openlibs(L);
+    (void)command;  /* suppress unused arg warn */
 
     erluna_t *data = (erluna_t *)driver_alloc(sizeof(erluna_t));
     data->port = port;
@@ -101,4 +112,7 @@ static void ready_async(ErlDrvData handle, ErlDrvThreadData async_handle)
     driver_free(async_data->args);
     driver_free(async_data);
 }
+
+/* vi:ts=4 sw=4 et fdm=marker
+ * */
 
