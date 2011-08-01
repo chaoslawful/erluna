@@ -58,13 +58,19 @@ void erluna_dispatch(void *async_handle)
     ei_decode_char(data->args, &i, &command);
 
     ei_get_type(data->args, &i, &type, &size);
-    if (type != ERL_STRING_EXT) {
+    if (type != ERL_STRING_EXT && type != ERL_BINARY_EXT) {
         set_error(data, "Arguments type error.");
         return;
     }
 
     char *first_arg = driver_alloc(sizeof(char) * (size + 1));
-    ei_decode_string(data->args, &i, first_arg);
+	if(type == ERL_STRING_EXT) {
+	    ei_decode_string(data->args, &i, first_arg);
+	} else {
+		long len = 0;
+		ei_decode_binary(data->args, &i, first_arg, &len);
+		first_arg[len] = '\0';
+	}
 
     switch (command) {
         case EVAL:

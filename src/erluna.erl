@@ -66,7 +66,7 @@ driver_dir() ->
     end.
 
 open() ->
-  {ok, #erluna{port = open_port({spawn, ?DRIVER_NAME}, [])}}.
+  {ok, #erluna{port = open_port({spawn_driver, ?DRIVER_NAME}, [binary])}}.
 
 stop(Lua) ->
   erlang:port_close(Lua#erluna.port),
@@ -75,7 +75,7 @@ stop(Lua) ->
 receive_data(Lua) ->
   Port = Lua#erluna.port,
   receive
-    {Port, {data, Result}} -> binary_to_term(list_to_binary(Result))
+    {Port, {data, Result}} -> binary_to_term(Result)
   end.
 
 eval(Source, Lua) ->

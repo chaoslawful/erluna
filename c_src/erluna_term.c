@@ -19,6 +19,7 @@ static int erlang_to_long(async_erluna_t *data, int *index);
 static int erlang_to_double(async_erluna_t *data, int *index);
 static int erlang_to_atom(async_erluna_t *data, int *index, int size);
 static int erlang_to_string(async_erluna_t *data, int *index, int size);
+static int erlang_to_binary(async_erluna_t *data, int *index, int size);
 static int erlang_to_list(async_erluna_t *data, int *index);
 static int erlang_to_tuple(async_erluna_t *data, int *index);
 
@@ -35,7 +36,11 @@ void lua_to_erlang(async_erluna_t *data, int index)
             lua_to_boolean(data, index);
             break;
         case LUA_TSTRING:
-            ei_x_encode_string(data->result, lua_tostring(data->L, index));
+			{
+				size_t len = 0;
+				const char *bin = lua_tolstring(data->L, index, &len);
+	            ei_x_encode_binary(data->result, bin, len);
+			}
             break;
         case LUA_TTABLE:
             lua_to_table(data, index);
@@ -129,6 +134,7 @@ int erlang_to_lua(async_erluna_t *data, int *index)
         case ERL_LIST_EXT:
             return erlang_to_list(data, index);
         case ERL_BINARY_EXT:
+			return erlang_to_binary(data, index, size);
         case ERL_SMALL_BIG_EXT:
         case ERL_LARGE_BIG_EXT:
         case ERL_NEW_FUN_EXT:
@@ -193,6 +199,18 @@ static int erlang_to_string(async_erluna_t *data, int *index, int size)
     lua_pushlstring(data->L, string, size);
 
     driver_free(string);
+    return 1;
+}
+
+static int erlang_to_binary(async_erluna_t *data, int *index, int size)
+{
+    void *bin = driver_alloc(sizeof(char) * size);
+	long len = 0;
+
+    ei_decode_binary(data->args, index, bin, &len);
+    lua_pushlstring(data->L, bin, len);
+
+    driver_free(bin);
     return 1;
 }
 
