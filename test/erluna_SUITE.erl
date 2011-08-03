@@ -99,3 +99,4 @@ test_eval_file(Conf) ->
 	?assertMatch(Lua:eval_file(File), ok, eval_test_lua),
 	?assertMatch(Lua:stop(), ok, stop),
 	ok.
+

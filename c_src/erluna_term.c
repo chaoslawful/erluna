@@ -1,4 +1,3 @@
-//#include <stdio.h>
 #include <string.h> // strcmp
 
 #include <ei.h>
@@ -36,11 +35,11 @@ void lua_to_erlang(async_erluna_t *data, int index)
             lua_to_boolean(data, index);
             break;
         case LUA_TSTRING:
-			{
-				size_t len = 0;
-				const char *bin = lua_tolstring(data->L, index, &len);
-	            ei_x_encode_binary(data->result, bin, len);
-			}
+            {
+                size_t len = 0;
+                const char *bin = lua_tolstring(data->L, index, &len);
+                ei_x_encode_binary(data->result, bin, len);
+            }
             break;
         case LUA_TTABLE:
             lua_to_table(data, index);
@@ -86,8 +85,10 @@ static void lua_to_table(async_erluna_t *data, int index)
 {
     int arity = 0;
 
+    rel2abs(data->L, index);
+
     lua_pushnil(data->L);
-    while (lua_next(data->L, index - 1)) {
+    while (lua_next(data->L, index)) {
         arity++;
         lua_pop(data->L, 1);
     }
@@ -95,7 +96,7 @@ static void lua_to_table(async_erluna_t *data, int index)
     ei_x_encode_list_header(data->result, arity);
 
     lua_pushnil(data->L);
-    while (lua_next(data->L, index - 1)) {
+    while (lua_next(data->L, index)) {
         ei_x_encode_tuple_header(data->result, 2);
         lua_to_erlang(data, -2);
         lua_to_erlang(data, -1);
@@ -134,7 +135,7 @@ int erlang_to_lua(async_erluna_t *data, int *index)
         case ERL_LIST_EXT:
             return erlang_to_list(data, index);
         case ERL_BINARY_EXT:
-			return erlang_to_binary(data, index, size);
+            return erlang_to_binary(data, index, size);
         case ERL_SMALL_BIG_EXT:
         case ERL_LARGE_BIG_EXT:
         case ERL_NEW_FUN_EXT:
@@ -205,7 +206,7 @@ static int erlang_to_string(async_erluna_t *data, int *index, int size)
 static int erlang_to_binary(async_erluna_t *data, int *index, int size)
 {
     void *bin = driver_alloc(sizeof(char) * size);
-	long len = 0;
+    long len = 0;
 
     ei_decode_binary(data->args, index, bin, &len);
     lua_pushlstring(data->L, bin, len);
@@ -291,4 +292,7 @@ static int erlang_to_tuple(async_erluna_t *data, int *index)
     lua_rawset(data->L, -3);
     return 1;
 }
+
+/* vim: ft=c ts=4 sw=4 et fdm=marker
+ * */
 
