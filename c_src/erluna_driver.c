@@ -3,6 +3,7 @@
 
 #include "ei.h"
 #include "erl_driver.h"
+#include "erl_drv_comp.h"
 
 #include "lua.h"
 #include "lauxlib.h"
@@ -18,7 +19,7 @@ typedef struct {
 
 static ErlDrvData start(ErlDrvPort port, char *command);
 static void stop(ErlDrvData handle);
-static void output(ErlDrvData handle, char *buf, int len);
+static void output(ErlDrvData handle, char *buf, ErlDrvSizeT len);
 static void ready_async(ErlDrvData handle, ErlDrvThreadData async_handle);
 
 static ErlDrvEntry erluna_driver_entry = {
@@ -76,7 +77,7 @@ static void stop(ErlDrvData handle)
     driver_free((char *)handle);
 }
 
-static void output(ErlDrvData handle, char *buf, int len)
+static void output(ErlDrvData handle, char *buf, ErlDrvSizeT len)
 {
     erluna_t *data = (erluna_t *)handle;
 
